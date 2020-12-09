@@ -1769,6 +1769,8 @@ const (
 	LabelID = "id"
 	// LabelName is the name of the name label.
 	LabelName = "name"
+	//统一dockercontainer和k8s container的name
+	LabelName1 = "container_name"
 	// LabelImage is the name of the image label.
 	LabelImage = "image"
 )
@@ -1780,6 +1782,7 @@ func DefaultContainerLabels(container *info.ContainerInfo) map[string]string {
 	set := map[string]string{LabelID: container.Name}
 	if len(container.Aliases) > 0 {
 		set[LabelName] = container.Aliases[0]
+		set[LabelName1] = container.Aliases[0]
 	}
 	if image := container.Spec.Image; len(image) > 0 {
 		set[LabelImage] = image
@@ -1805,6 +1808,7 @@ func BaseContainerLabels(whiteList []string) func(container *info.ContainerInfo)
 		set := map[string]string{LabelID: container.Name}
 		if len(container.Aliases) > 0 {
 			set[LabelName] = container.Aliases[0]
+			set[LabelName1] = container.Aliases[0]
 		}
 		if image := container.Spec.Image; len(image) > 0 {
 			set[LabelImage] = image
