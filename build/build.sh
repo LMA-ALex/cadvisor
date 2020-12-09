@@ -50,14 +50,18 @@ if [ -n "$VERBOSE" ]; then
   echo "Building with -ldflags $ldflags"
 fi
 
+echo "1"
 # Since github.com/google/cadvisor/cmd is a submodule, we must build from inside that directory
 output_file="$PWD/cadvisor"
+echo "2"
 pushd cmd > /dev/null
+echo "$GOARCH"
 if [ -z "$GOARCH" ]
 then
   go build ${GO_FLAGS} -ldflags "${ldflags}" -o "${output_file}" "${repo_path}/cmd"
 else
-  env GOOS=linux GOARCH=$GOARCH go build ${GO_FLAGS} -ldflags "${ldflags}" -o "${output_file}" "${repo_path}/cmd"
+  echo "there it is${GO_FLAGS}  ${ldflags}   ${output_file} ${repo_path}/cmd "
+  env GOOS=linux GOARCH=$GOARCH go build ${GO_FLAGS}  -o "${output_file}"
 fi
 popd > /dev/null
 

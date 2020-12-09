@@ -269,41 +269,42 @@ func NewPrometheusCollector(i infoProvider, f ContainerLabelsFunc, includedMetri
 				getValues: func(s *info.ContainerStats) metricValues {
 					return metricValues{{value: float64(s.Cpu.LoadAverage), timestamp: s.Timestamp}}
 				},
-			}, {
-				name:        "container_tasks_state",
-				help:        "Number of tasks in given state",
-				extraLabels: []string{"state"},
-				valueType:   prometheus.GaugeValue,
-				getValues: func(s *info.ContainerStats) metricValues {
-					return metricValues{
-						{
-							value:     float64(s.TaskStats.NrSleeping),
-							labels:    []string{"sleeping"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.TaskStats.NrRunning),
-							labels:    []string{"running"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.TaskStats.NrStopped),
-							labels:    []string{"stopped"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.TaskStats.NrUninterruptible),
-							labels:    []string{"uninterruptible"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.TaskStats.NrIoWait),
-							labels:    []string{"iowaiting"},
-							timestamp: s.Timestamp,
-						},
-					}
-				},
 			},
+			//{
+			//	name:        "container_tasks_state",
+			//	help:        "Number of tasks in given state",
+			//	extraLabels: []string{"state"},
+			//	valueType:   prometheus.GaugeValue,
+			//	getValues: func(s *info.ContainerStats) metricValues {
+			//		return metricValues{
+			//			{
+			//				value:     float64(s.TaskStats.NrSleeping),
+			//				labels:    []string{"sleeping"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.TaskStats.NrRunning),
+			//				labels:    []string{"running"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.TaskStats.NrStopped),
+			//				labels:    []string{"stopped"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.TaskStats.NrUninterruptible),
+			//				labels:    []string{"uninterruptible"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.TaskStats.NrIoWait),
+			//				labels:    []string{"iowaiting"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//		}
+			//	},
+			//},
 		}...)
 	}
 	if includedMetrics.Has(container.HugetlbUsageMetrics) {
@@ -423,36 +424,36 @@ func NewPrometheusCollector(i infoProvider, f ContainerLabelsFunc, includedMetri
 					return metricValues{{value: float64(s.Memory.WorkingSet), timestamp: s.Timestamp}}
 				},
 			},
-			{
-				name:        "container_memory_failures_total",
-				help:        "Cumulative count of memory allocation failures.",
-				valueType:   prometheus.CounterValue,
-				extraLabels: []string{"failure_type", "scope"},
-				getValues: func(s *info.ContainerStats) metricValues {
-					return metricValues{
-						{
-							value:     float64(s.Memory.ContainerData.Pgfault),
-							labels:    []string{"pgfault", "container"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.Memory.ContainerData.Pgmajfault),
-							labels:    []string{"pgmajfault", "container"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.Memory.HierarchicalData.Pgfault),
-							labels:    []string{"pgfault", "hierarchy"},
-							timestamp: s.Timestamp,
-						},
-						{
-							value:     float64(s.Memory.HierarchicalData.Pgmajfault),
-							labels:    []string{"pgmajfault", "hierarchy"},
-							timestamp: s.Timestamp,
-						},
-					}
-				},
-			},
+			//{
+			//	name:        "container_memory_failures_total",
+			//	help:        "Cumulative count of memory allocation failures.",
+			//	valueType:   prometheus.CounterValue,
+			//	extraLabels: []string{"failure_type", "scope"},
+			//	getValues: func(s *info.ContainerStats) metricValues {
+			//		return metricValues{
+			//			{
+			//				value:     float64(s.Memory.ContainerData.Pgfault),
+			//				labels:    []string{"pgfault", "container"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.Memory.ContainerData.Pgmajfault),
+			//				labels:    []string{"pgmajfault", "container"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.Memory.HierarchicalData.Pgfault),
+			//				labels:    []string{"pgfault", "hierarchy"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//			{
+			//				value:     float64(s.Memory.HierarchicalData.Pgmajfault),
+			//				labels:    []string{"pgmajfault", "hierarchy"},
+			//				timestamp: s.Timestamp,
+			//			},
+			//		}
+			//	},
+			//},
 		}...)
 	}
 	if includedMetrics.Has(container.MemoryNumaMetrics) {
@@ -1850,29 +1851,29 @@ func (c *PrometheusCollector) collectContainersInfo(ch chan<- prometheus.Metric)
 			}
 		}
 
-		// Container spec
-		desc := prometheus.NewDesc("container_start_time_seconds", "Start time of the container since unix epoch in seconds.", labels, nil)
-		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.CreationTime.Unix()), values...)
+		//// Container spec
+		//desc := prometheus.NewDesc("container_start_time_seconds", "Start time of the container since unix epoch in seconds.", labels, nil)
+		//ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.CreationTime.Unix()), values...)
 
-		if cont.Spec.HasCpu {
-			desc = prometheus.NewDesc("container_spec_cpu_period", "CPU period of the container.", labels, nil)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Period), values...)
-			if cont.Spec.Cpu.Quota != 0 {
-				desc = prometheus.NewDesc("container_spec_cpu_quota", "CPU quota of the container.", labels, nil)
-				ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Quota), values...)
-			}
-			desc := prometheus.NewDesc("container_spec_cpu_shares", "CPU share of the container.", labels, nil)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Limit), values...)
-
-		}
-		if cont.Spec.HasMemory {
-			desc := prometheus.NewDesc("container_spec_memory_limit_bytes", "Memory limit for the container.", labels, nil)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.Limit), values...)
-			desc = prometheus.NewDesc("container_spec_memory_swap_limit_bytes", "Memory swap limit for the container.", labels, nil)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.SwapLimit), values...)
-			desc = prometheus.NewDesc("container_spec_memory_reservation_limit_bytes", "Memory reservation limit for the container.", labels, nil)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.Reservation), values...)
-		}
+		//if cont.Spec.HasCpu {
+		//	desc = prometheus.NewDesc("container_spec_cpu_period", "CPU period of the container.", labels, nil)
+		//	ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Period), values...)
+		//	if cont.Spec.Cpu.Quota != 0 {
+		//		desc = prometheus.NewDesc("container_spec_cpu_quota", "CPU quota of the container.", labels, nil)
+		//		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Quota), values...)
+		//	}
+		//	desc := prometheus.NewDesc("container_spec_cpu_shares", "CPU share of the container.", labels, nil)
+		//	ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(cont.Spec.Cpu.Limit), values...)
+		//
+		//}
+		//if cont.Spec.HasMemory {
+		//	desc := prometheus.NewDesc("container_spec_memory_limit_bytes", "Memory limit for the container.", labels, nil)
+		//	ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.Limit), values...)
+		//	desc = prometheus.NewDesc("container_spec_memory_swap_limit_bytes", "Memory swap limit for the container.", labels, nil)
+		//	ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.SwapLimit), values...)
+		//	desc = prometheus.NewDesc("container_spec_memory_reservation_limit_bytes", "Memory reservation limit for the container.", labels, nil)
+		//	ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, specMemoryValue(cont.Spec.Memory.Reservation), values...)
+		//}
 
 		// Now for the actual metrics
 		if len(cont.Stats) == 0 {
