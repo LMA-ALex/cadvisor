@@ -61,7 +61,7 @@ then
   go build ${GO_FLAGS} -ldflags "${ldflags}" -o "${output_file}" "${repo_path}/cmd"
 else
   echo "there it is${GO_FLAGS}  ${ldflags}   ${output_file} ${repo_path}/cmd "
-  env GOOS=linux GOARCH=$GOARCH go build ${GO_FLAGS}  -o "${output_file}"
+  env GOOS=linux GOARCH=$GOARCH go build ${GO_FLAGS} -a -ldflags "-extldflags '-static'"  -o "${output_file}"
 fi
 popd > /dev/null
 

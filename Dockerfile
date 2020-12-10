@@ -1,5 +1,5 @@
 # reference : https://github.com/google/cadvisor/blob/master/deploy/Dockerfile
-FROM alpine:latest  
+FROM registry-jinan-lab.inspurcloud.cn/library/os/inspur-alpine-3.10:5.0.0
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk --no-cache add libc6-compat device-mapper findutils && \
