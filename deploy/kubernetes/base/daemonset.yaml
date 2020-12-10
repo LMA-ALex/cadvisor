@@ -2,29 +2,36 @@ apiVersion: apps/v1 # for Kubernetes versions before 1.9.0 use apps/v1beta2
 kind: DaemonSet
 metadata:
   name: cadvisor
-  namespace: cadvisor
+  namespace: monitoring
   annotations:
       seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
 spec:
   selector:
     matchLabels:
-      name: cadvisor
+      name: monitoring-node-cadvisor
+      app: monitoring-node-cadvisor
   template:
     metadata:
       labels:
-        name: cadvisor
+        name: monitoring-node-cadvisor
+        app: monitoring-node-cadvisor
     spec:
       serviceAccountName: cadvisor
       containers:
-      - name: cadvisor
+      - command:
+          - /usr/bin/cadvisor
+          - --housekeeping_interval=10s                           # kubernetes default args
+          - --max_housekeeping_interval=15s
+          - --event_storage_event_limit=default=0
+          - --event_storage_age_limit=default=0
+          - --logtostderr=true  #将日志打到控制台
+          - --store_container_labels=false
+          - --docker_only=true
+          - --disable_root_cgroup_stats=false
+          - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace
+          - --disable_metrics=percpu,hugetlb,sched,tcp,udp,advtcp,process,network,disk,accelerator,memory_numa,referenced_memory
+        name: cadvisor
         image: k8s.gcr.io/cadvisor:v0.30.2
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 150m
-          limits:
-            memory: 2000Mi
-            cpu: 300m
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -45,6 +52,9 @@ spec:
           - name: http
             containerPort: 8080
             protocol: TCP
+        securityContext:
+          privileged: true
+          procMount: Default
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
