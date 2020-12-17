@@ -31,7 +31,7 @@ spec:
           - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace
           - --disable_metrics=percpu,hugetlb,sched,tcp,udp,advtcp,process,network,disk,accelerator,memory_numa,referenced_memory
         name: cadvisor
-        image: k8s.gcr.io/cadvisor:v0.30.2
+        image: registry-jinan-lab.inspurcloud.cn/service/lma/cadvisor:test
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs

@@ -1762,31 +1762,32 @@ func (c *PrometheusCollector) Collect(ch chan<- prometheus.Metric) {
 
 const (
 	// ContainerLabelPrefix is the prefix added to all container labels.
-	ContainerLabelPrefix = "container_label_"
+	ContainerLabelPrefix = ""
 	// ContainerEnvPrefix is the prefix added to all env variable labels.
-	ContainerEnvPrefix = "container_env_"
+	ContainerEnvPrefix = ""
 	// LabelID is the name of the id label.
-	LabelID = "id"
+	//LabelID = "id"
 	// LabelName is the name of the name label.
 	LabelName = "name"
 	//统一dockercontainer和k8s container的name
-	LabelName1 = "container_name"
+	LabelName1 = "container"
 	// LabelImage is the name of the image label.
-	LabelImage = "image"
+	//LabelImage = "image"
 )
 
 // DefaultContainerLabels implements ContainerLabelsFunc. It exports the
 // container name, first alias, image name as well as all its env and label
 // values.
 func DefaultContainerLabels(container *info.ContainerInfo) map[string]string {
-	set := map[string]string{LabelID: container.Name}
+	//set := map[string]string{LabelID: container.Name}
+	set := map[string]string{}
 	if len(container.Aliases) > 0 {
 		set[LabelName] = container.Aliases[0]
 		set[LabelName1] = container.Aliases[0]
 	}
-	if image := container.Spec.Image; len(image) > 0 {
-		set[LabelImage] = image
-	}
+	//if image := container.Spec.Image; len(image) > 0 {
+	//	set[LabelImage] = image
+	//}
 	for k, v := range container.Spec.Labels {
 		set[ContainerLabelPrefix+k] = v
 	}
@@ -1805,17 +1806,19 @@ func BaseContainerLabels(whiteList []string) func(container *info.ContainerInfo)
 	}
 
 	return func(container *info.ContainerInfo) map[string]string {
-		set := map[string]string{LabelID: container.Name}
+		//set := map[string]string{LabelID: container.Name}
+		set := map[string]string{}
 		if len(container.Aliases) > 0 {
 			set[LabelName] = container.Aliases[0]
 			set[LabelName1] = container.Aliases[0]
 		}
-		if image := container.Spec.Image; len(image) > 0 {
-			set[LabelImage] = image
-		}
+		//if image := container.Spec.Image; len(image) > 0 {
+		//	set[LabelImage] = image
+		//}
 		for k, v := range container.Spec.Labels {
 			if _, ok := whiteListMap[k]; ok {
 				set[ContainerLabelPrefix+k] = v
+
 			}
 		}
 		return set
