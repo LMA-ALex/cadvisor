@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/cadvisor/container"
@@ -1767,10 +1768,8 @@ const (
 	ContainerEnvPrefix = ""
 	// LabelID is the name of the id label.
 	//LabelID = "id"
-	// LabelName is the name of the name label.
-	LabelName = "name"
 	//统一dockercontainer和k8s container的name
-	LabelName1 = "container"
+	LabelName = "container"
 	// LabelImage is the name of the image label.
 	//LabelImage = "image"
 )
@@ -1781,14 +1780,21 @@ const (
 func DefaultContainerLabels(container *info.ContainerInfo) map[string]string {
 	//set := map[string]string{LabelID: container.Name}
 	set := map[string]string{}
-	if len(container.Aliases) > 0 {
-		set[LabelName] = container.Aliases[0]
-		set[LabelName1] = container.Aliases[0]
+	//如果为0，则认为是docker container，目的是统一metrics的label
+	if len(container.Spec.Labels) == 0{
+		if len(container.Aliases) > 0 {
+			set[LabelName] = container.Aliases[0]
+		}
 	}
 	//if image := container.Spec.Image; len(image) > 0 {
 	//	set[LabelImage] = image
 	//}
 	for k, v := range container.Spec.Labels {
+		if strings.HasSuffix(k, "namespace"){
+			k = strings.TrimPrefix(k, "io.kubernetes.pod.")
+		}
+		k = strings.TrimPrefix(k, "io.kubernetes.")
+		k = strings.TrimSuffix(k, ".name")
 		set[ContainerLabelPrefix+k] = v
 	}
 	for k, v := range container.Spec.Envs {
@@ -1808,15 +1814,22 @@ func BaseContainerLabels(whiteList []string) func(container *info.ContainerInfo)
 	return func(container *info.ContainerInfo) map[string]string {
 		//set := map[string]string{LabelID: container.Name}
 		set := map[string]string{}
-		if len(container.Aliases) > 0 {
-			set[LabelName] = container.Aliases[0]
-			set[LabelName1] = container.Aliases[0]
+		//如果为0，则认为是docker container，目的是统一metrics的label
+		if len(container.Spec.Labels) == 0{
+			if len(container.Aliases) > 0 {
+				set[LabelName] = container.Aliases[0]
+			}
 		}
 		//if image := container.Spec.Image; len(image) > 0 {
 		//	set[LabelImage] = image
 		//}
 		for k, v := range container.Spec.Labels {
 			if _, ok := whiteListMap[k]; ok {
+				if strings.HasSuffix(k, "namespace"){
+					k = strings.TrimPrefix(k, "io.kubernetes.pod.")
+				}
+				k = strings.TrimPrefix(k, "io.kubernetes.")
+				k = strings.TrimSuffix(k, ".name")
 				set[ContainerLabelPrefix+k] = v
 
 			}
