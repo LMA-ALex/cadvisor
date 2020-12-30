@@ -16,6 +16,7 @@ package container
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 
 	"github.com/google/cadvisor/fs"
@@ -41,6 +42,11 @@ type ContainerHandlerFactory interface {
 
 // MetricKind represents the kind of metrics that cAdvisor exposes.
 type MetricKind string
+
+type BlackList struct {
+	list        map[MetricKind]struct{}
+	rList       []*regexp.Regexp
+}
 
 const (
 	CpuUsageMetrics                MetricKind = "cpu"
@@ -88,10 +94,37 @@ var AllMetrics = MetricSet{
 	CPUTopologyMetrics:             struct{}{},
 	ResctrlMetrics:                 struct{}{},
 }
+// New constructs a new BlackList based on a blacklist .
+func New(b MetricSet) (*BlackList, error) {
+
+	newList := map[MetricKind]struct{}{}
+	for k, v := range b {
+		newList[k] = v
+	}
+	return &BlackList{
+		list:    newList,
+	}, nil
+}
+
+// Parse parses and compiles all of the regexes in the BlackList.
+func (l *BlackList) Parse() error {
+	var regexes []*regexp.Regexp
+	for item := range l.list {
+		r, err := regexp.Compile(item.String())
+		if err != nil {
+			return err
+		}
+		regexes = append(regexes, r)
+	}
+	l.rList = regexes
+	return nil
+}
 
 func (mk MetricKind) String() string {
 	return string(mk)
 }
+
+
 
 type MetricSet map[MetricKind]struct{}
 
@@ -244,3 +277,5 @@ func DebugInfo() map[string][]string {
 	}
 	return out
 }
+
+

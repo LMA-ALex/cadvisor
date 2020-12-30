@@ -111,6 +111,7 @@ var (
 		container.CPUTopologyMetrics:             struct{}{},
 		container.ResctrlMetrics:                 struct{}{},
 	}
+	ignoreExactMetrics  metricSetValue = metricSetValue{container.MetricSet{}}
 )
 
 type metricSetValue struct {
@@ -142,6 +143,7 @@ func (ml *metricSetValue) Set(value string) error {
 
 func init() {
 	flag.Var(&ignoreMetrics, "disable_metrics", "comma-separated list of `metrics` to be disabled. Options are 'accelerator', 'cpu_topology','disk', 'diskIO', 'memory_numa', 'network', 'tcp', 'udp', 'percpu', 'sched', 'process', 'hugetlb', 'referenced_memory', 'resctrl'.")
+	flag.Var(&ignoreExactMetrics, "metric-blacklist", "Comma-separated list of metrics not to be enabled. This list comprises of exact metric names and/or regex patterns.")
 
 	// Default logging verbosity to V(2)
 	flag.Set("v", "2")
@@ -158,6 +160,7 @@ func main() {
 	}
 
 	includedMetrics := toIncludedMetrics(ignoreMetrics.MetricSet)
+	BlackList, err := container.New(ignoreExactMetrics.MetricSet)
 
 	setMaxProcs()
 
